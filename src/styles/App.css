@@ -21,3 +21,22 @@
     justify-content: space-between;
     align-items: center;
 }
+
+/* ======= REACT TRANSITION GROUP FOR POSTS ======= */
+
+.post-enter {
+    transform: translateX(-350px);
+  }
+  .post-enter-active {
+    transform: translateX(0);
+    transition: all 500ms ease-in;
+  }
+  .post-exit {
+    opacity: 1;
+  }
+  .post-exit-active {
+    transform: translateX(-350px);
+    transition: all 500ms ease-in;
+  }
+
+  /* ======= END REACT TRANSITION GROUP FOR POSTS ======= */
