@@ -6,20 +6,23 @@ import PostFilter from "./components/PostFilter"
 import MyModal from "./components/UI/modal/MyModal"
 import MyButton from "./components/UI/button/MyButton"
 import { usePosts } from "./hooks/usePosts"
+import axios from 'axios'
 
 function App() {
-  const [posts, setPosts] = useState([
-    {id: 1, title: 'aa 1', body: 'yy 1'},
-    {id: 2, title: 'cc 2', body: 'xx 2'},
-    {id: 3, title: 'bb 3', body: 'zz 3'},
-  ])
+  const [posts, setPosts] = useState([])
   const [filter, setFilter] = useState({sort: '', query: ''})
   const [modal, setModal] = useState(false);
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
-    setModal(false )
+
+    setModal(false)
+  }
+
+  async function fetchPosts() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/posts')
+    setPosts(response.data)
   }
 
   const removePost = (id) => {
@@ -29,6 +32,7 @@ function App() {
 
   return (
     <div className="App">
+      <button onClick={fetchPosts}>Get Posts</button>
       <MyButton style={{marginTop: '30px'}} onClick={() => setModal(true)}>
         Create Post
       </MyButton>
