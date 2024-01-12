@@ -11,6 +11,8 @@ import Loader from "../components/UI/Loader/Loader"
 import { useFetching } from "../hooks/useFetching"
 import { getPageCount, getPagesArray } from "../utils/pages"
 import Pagination from "../components/UI/pagination/Pagination"
+import { useObserver } from "../hooks/useObserver"
+import MySelect from "../components/UI/select/MySelect"
 
 function Posts() {
   const [posts, setPosts] = useState([])
@@ -21,7 +23,6 @@ function Posts() {
   const [page, setPage] = useState(1)
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
   const lastElement = useRef()
-  const observer = useRef()
 
   const [fetchPosts, isPostsLoading, postError] = useFetching(async (limit, page) => {
     const response = await PostService.getAll(limit, page)
@@ -30,23 +31,13 @@ function Posts() {
     setTotalPage(getPageCount(totalCount, limit))
   })
 
-  useEffect(() => {
-    if (isPostsLoading) return;
-    if (observer.current) observer.current.disconnect();
-    let callback = function(entries, observer) {
-      if (entries[0].isIntersecting && page < totalPage) {
-        console.log('PAGE', page)
-        setPage(page+1)
-      }
-    }
-    
-    observer.current = new IntersectionObserver(callback);
-    observer.current.observe(lastElement.current)
-  }, [isPostsLoading])
+  useObserver(lastElement, page < totalPage, isPostsLoading, () => {
+    setPage(page + 1)
+  })
 
   useEffect(() => {   
     fetchPosts(limit, page)
-  }, [page])
+  }, [page, limit])
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost])
@@ -74,6 +65,17 @@ function Posts() {
         <PostFilter 
           filter={filter} 
           setFilter={setFilter} 
+        />
+        <MySelect 
+          value={limit}
+          onChange={value => setLimit(value)}
+          defaultValue="Posts per page"
+          options={[
+            {value: 5, name:'5'},
+            {value: 10, name:'10'},
+            {value: 25, name:'25'},
+            {value: -1, name: 'Show all'}
+          ]}
         />
         {postError && 
           <h1>`Something went wrong, ${postError}`</h1>}
