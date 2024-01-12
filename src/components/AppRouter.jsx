@@ -4,9 +4,16 @@ import Posts from '../pages/Posts'
 import Error from '../pages/Error'
 import SinglePost from '../pages/SinglePost'
 import Login from '../pages/Login'
+import { useContext } from 'react'
+import { AuthContext } from '../context'
+import Loader from './UI/Loader/Loader'
 
 const AppRouter = () => {
-    const isAuth = false;
+    const {isAuth, isLoading} = useContext(AuthContext)
+
+    if (isLoading) {
+        return <Loader />
+    }
     return ( 
         isAuth
             ? 
